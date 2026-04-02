@@ -25,8 +25,21 @@
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+The scheduler uses a **greedy knapsack** in `_select_within_budget`: it walks the
+priority-sorted task list and includes each task as long as it fits in the remaining
+time budget, stopping as soon as a task would overflow.
+
+*Tradeoff:* A high-priority but long task (e.g., a 50-minute grooming session) can
+consume so much of a 60-minute budget that several shorter, moderately important tasks
+(e.g., two 5-minute feeding checks) are dropped entirely — even though those shorter
+tasks would have collectively fit in the leftover time.
+
+*Why it is reasonable here:* For a daily pet-care app, priority order is the right
+tiebreaker. An owner almost always wants the most critical task (medication, vet visit)
+guaranteed over lower-priority ones. The greedy approach is also O(n log n) to sort
+plus O(n) to select, which is easy to reason about and test. A true 0/1 knapsack would
+find the theoretically optimal combination, but it is exponential in the number of tasks
+and far harder to explain to a non-technical user.
 
 ---
 
