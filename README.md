@@ -38,6 +38,44 @@ The scheduler (`Scheduler` in `pawpal_system.py`) goes beyond a simple task list
   - *Same-pet*: two tasks for one pet overlap in the assigned time window.
   - *Cross-pet*: tasks belonging to different pets overlap, meaning the owner would be double-booked.
 
+## Testing PawPal+
+
+### Run the test suite
+
+```bash
+python -m pytest
+```
+
+To see each test name as it runs:
+
+```bash
+python -m pytest -v
+```
+
+### What the tests cover
+
+The suite contains **32 tests** across five classes in `tests/test_pawpal.py`:
+
+| Class | Tests | What is verified |
+|---|---|---|
+| `TestMarkComplete` | 3 | Task defaults to incomplete; `mark_complete()` sets the flag; calling it twice is safe |
+| `TestAddTask` | 4 | New pet has no tasks; each `add_task()` grows the list; the stored object is the same reference |
+| `TestRecurrenceLogic` | 9 | Daily → tomorrow; weekly → 7 days; weekdays on Friday → Monday; `NONE` returns `None`; `Pet.complete_task()` auto-appends next occurrence; unknown task id is safe |
+| `TestSortingCorrectness` | 4 | `display_summary()` is chronological; higher priority ranks first; equal-priority tiebreaks by time-of-day band; same-band tasks are scheduled back-to-back |
+| `TestConflictDetection` | 8 | Back-to-back tasks don't conflict (boundary check); overlapping and fully-contained tasks are flagged; cross-pet overlaps produce a warning; non-overlapping cross-pet tasks are clean |
+| `TestBudgetFitting` | 4 | Task exactly at budget is included; one minute over is excluded; empty list is safe; greedy stops after budget is exhausted |
+
+### Confidence level
+
+**4 / 5 stars**
+
+The core scheduling pipeline — prioritization, budget fitting, time assignment, and conflict detection — is fully covered, including the most common boundary conditions (exact budget fit, adjacent task endpoints, Friday weekday recurrence). Confidence is high for single-day scheduling with a small number of tasks per pet, which is the primary use case.
+
+The one star withheld reflects gaps in the current suite:
+- No tests for the Streamlit UI layer (`app.py`)
+- No tests for tasks long enough to push the scheduler cursor past midnight
+- No integration test that runs `generate_all_plans()` end-to-end and inspects the full output
+
 ## Getting started
 
 ### Setup
