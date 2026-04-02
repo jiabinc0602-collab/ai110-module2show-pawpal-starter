@@ -4,15 +4,11 @@
 
 **a. Initial design**
 
-- Briefly describe your initial UML design.
-    - Classes: task_category to have a set of tasks, timeofday to have a select time of day for the task, task to be able to create an instance of the task, pet class to be able to have multiple instances of pets, and owners in case there can be multiple owners for a pet, planning and scheduling classes to ensure no conflicting schedules.
-- What classes did you include, and what responsibilities did you assign to each?
+The UML started with seven classes where each one had a clear task: enums contained valid values, `Task` held the care work, `Pet` and `Owner` to create instances of both objects, and `Scheduler` was the only thing allowed to produce a plan.
 
 **b. Design changes**
 
-- Did your design change during implementation?
-    - Yes, missing relationships like Task to Pet, and no edit task on Pet. Also start_time and end_time are represented in strings instead of datetime.
-- If yes, describe at least one change and why you made it.
+The biggest fix was adding a back reference from `Task` to `Pet` and swapping the string timestamps for actual `datetime.time` objects so the scheduler could do real math instead of parsing strings.
 
 ---
 
@@ -20,26 +16,11 @@
 
 **a. Constraints and priorities**
 
-- What constraints does your scheduler consider (for example: time, priority, preferences)?
-- How did you decide which constraints mattered most?
+The scheduler weighs three things: how many minutes the owner has, how urgent each task is (priority 1 to 5), and what time of day each task prefers.
 
 **b. Tradeoffs**
 
-The scheduler uses a **greedy knapsack** in `_select_within_budget`: it walks the
-priority-sorted task list and includes each task as long as it fits in the remaining
-time budget, stopping as soon as a task would overflow.
-
-*Tradeoff:* A high-priority but long task (e.g., a 50-minute grooming session) can
-consume so much of a 60-minute budget that several shorter, moderately important tasks
-(e.g., two 5-minute feeding checks) are dropped entirely — even though those shorter
-tasks would have collectively fit in the leftover time.
-
-*Why it is reasonable here:* For a daily pet-care app, priority order is the right
-tiebreaker. An owner almost always wants the most critical task (medication, vet visit)
-guaranteed over lower-priority ones. The greedy approach is also O(n log n) to sort
-plus O(n) to select, which is easy to reason about and test. A true 0/1 knapsack would
-find the theoretically optimal combination, but it is exponential in the number of tasks
-and far harder to explain to a non-technical user.
+The greedy knapsack picks tasks in priority order and stops the moment one task would go over the budget, which means a single long high priority task can crowd out several shorter ones that would have fit in the leftover time, but for a pet care app that tradeoff is fine because meds and vet visits should always win.
 
 ---
 
@@ -47,13 +28,11 @@ and far harder to explain to a non-technical user.
 
 **a. How you used AI**
 
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+AI helped at every stage from sketching the UML to writing tests, and the prompts that worked best were concrete and outcome focused rather than vague and open ended.
 
 **b. Judgment and verification**
 
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
+When AI wanted to store the time budget directly on `Scheduler` I rejected it because that value would silently drift away from `Owner.time_available_minutes`, so I traced every call site to make sure the budget always comes straight from the owner.
 
 ---
 
@@ -61,13 +40,11 @@ and far harder to explain to a non-technical user.
 
 **a. What you tested**
 
-- What behaviors did you test?
-- Why were these tests important?
+The 32 tests hit the parts most likely to contain errors, such as recurrence date math (especially the Friday to Monday skip), budget boundary conditions, sort order, and both flavors of conflict detection.
 
 **b. Confidence**
 
-- How confident are you that your scheduler works correctly?
-- What edge cases would you test next if you had more time?
+Sitting at 4 out of 5 because the core pipeline is solid and all tests pass, though the UI layer, the midnight overflow edge case, and a full end to end integration test are still untouched.
 
 ---
 
@@ -75,12 +52,12 @@ and far harder to explain to a non-technical user.
 
 **a. What went well**
 
-- What part of this project are you most satisfied with?
+Giving each scheduler method exactly one job made the whole thing surprisingly easy to test and debug in isolation.
 
 **b. What you would improve**
 
-- If you had another iteration, what would you improve or redesign?
+The greedy selector can sacrifice several short useful tasks just to fit one long one, so the next version would try a smarter combination strategy instead.
 
 **c. Key takeaway**
 
-- What is one important thing you learned about designing systems or working with AI on this project?
+Drafting a UML before writing any code was genuinely worth it because AI becomes way more useful when it is filling in a structure you already understand rather than inventing one from scratch.

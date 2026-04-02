@@ -1,6 +1,45 @@
-# PawPal+ (Module 2 Project)
+# PawPal+
 
-You are building **PawPal+**, a Streamlit app that helps a pet owner plan care tasks for their pet.
+**PawPal+** is a Streamlit app that helps a pet owner build and manage a daily care schedule for one or more pets. The owner enters their available time, adds pets, defines tasks with priorities and recurrence rules, and the app produces a time-slotted plan — complete with conflict warnings and scheduling reasoning.
+
+---
+
+## Features
+
+### Owner & Pet Management
+- **Owner profile** — store your name, email, and daily time budget (in minutes).
+- **Multi-pet support** — add any number of pets, each with their own name, species, breed, age, and weight.
+- **Per-pet task lists** — tasks belong to a specific pet and carry a back-reference so they are always traceable.
+
+### Task Configuration
+- **Task categories** — classify each task as Walk, Feeding, Medication, Enrichment, Grooming, or Other.
+- **Priority levels** — assign a priority from 1 (low) to 5 (critical) to control scheduling order.
+- **Time-of-day preference** — tag each task as Morning, Afternoon, Evening, or Any to influence when it is placed in the day.
+- **Task editing** — update or replace any existing task by ID without recreating it from scratch.
+
+### Scheduling Algorithms
+- **Priority-based greedy scheduling** — the scheduler ranks tasks by priority (highest first), then by time-of-day band, and greedily fills the owner's time budget. The most critical tasks are always guaranteed a slot before lower-priority ones are considered.
+- **Time-of-day band assignment** — tasks are grouped into Morning (from 07:00), Afternoon (from 12:00), Evening (from 18:00), and Any (from 09:00) bands. Within each band, tasks are placed back-to-back with no gaps, producing a fully time-slotted plan.
+- **Sorting by start time** — the final plan is always displayed in chronological order regardless of the order tasks were added.
+
+### Recurrence
+- **Daily recurrence** — a task marked complete automatically generates a new instance due the following day.
+- **Weekdays recurrence** — the next occurrence skips the weekend; completing on Friday produces a Monday due date.
+- **Weekly recurrence** — the next occurrence is due exactly 7 days later.
+- **One-off tasks** — tasks with no recurrence rule are removed from future plans once completed.
+
+### Conflict Detection
+- **Same-pet conflict warnings** — if two tasks for the same pet overlap in their assigned time window, the scheduler surfaces a plain-language warning message instead of crashing.
+- **Cross-pet conflict warnings** — if tasks belonging to different pets overlap, the owner is flagged as double-booked. This catches cases like a dog walk and a cat vet visit both starting at 07:00.
+- **Back-to-back safety** — tasks that share only an endpoint (one ends exactly when the next begins) are correctly treated as non-conflicting.
+
+### Plan Filtering & Display
+- **Filter by category** — view only walks, only feedings, or any other category in isolation.
+- **Filter incomplete tasks** — see only what still needs to be done today.
+- **Budget metrics** — the UI shows scheduled minutes, total budget, and remaining time at a glance.
+- **Scheduling reasoning** — every generated plan includes a plain-text explanation of which tasks were chosen, in what priority order, and how much of the budget they consume.
+
+---
 
 ## Scenario
 
@@ -9,18 +48,6 @@ A busy pet owner needs help staying consistent with pet care. They want an assis
 - Track pet care tasks (walks, feeding, meds, enrichment, grooming, etc.)
 - Consider constraints (time available, priority, owner preferences)
 - Produce a daily plan and explain why it chose that plan
-
-Your job is to design the system first (UML), then implement the logic in Python, then connect it to the Streamlit UI.
-
-## What you will build
-
-Your final app should:
-
-- Let a user enter basic owner + pet info
-- Let a user add/edit tasks (duration + priority at minimum)
-- Generate a daily schedule/plan based on constraints and priorities
-- Display the plan clearly (and ideally explain the reasoning)
-- Include tests for the most important scheduling behaviors
 
 ## Smarter Scheduling
 
@@ -75,6 +102,9 @@ The one star withheld reflects gaps in the current suite:
 - No tests for the Streamlit UI layer (`app.py`)
 - No tests for tasks long enough to push the scheduler cursor past midnight
 - No integration test that runs `generate_all_plans()` end-to-end and inspects the full output
+
+## DEMO
+<a href="pawpal.png" target="_blank"><img src='pawpal.png' title='PawPal App' width='' alt='PawPal App' class='center-block' /></a>
 
 ## Getting started
 
