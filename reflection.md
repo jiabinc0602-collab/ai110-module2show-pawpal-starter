@@ -5,11 +5,13 @@
 **a. Initial design**
 
 - Briefly describe your initial UML design.
+    - Classes: task_category to have a set of tasks, timeofday to have a select time of day for the task, task to be able to create an instance of the task, pet class to be able to have multiple instances of pets, and owners in case there can be multiple owners for a pet, planning and scheduling classes to ensure no conflicting schedules.
 - What classes did you include, and what responsibilities did you assign to each?
 
 **b. Design changes**
 
 - Did your design change during implementation?
+    - Yes, missing relationships like Task to Pet, and no edit task on Pet. Also start_time and end_time are represented in strings instead of datetime.
 - If yes, describe at least one change and why you made it.
 
 ---
